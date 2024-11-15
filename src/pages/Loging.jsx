@@ -1,10 +1,13 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Loging = () => {
     const { handleLogin, setUser } = useContext(AuthContext);
-
+  const location = useLocation()
+  const navigate = useNavigate();
+  const [error,setError] = useState({})
+  console.log(location);
     const handleSubmit = (e) => {
         e.preventDefault();
         const form = e.target;
@@ -14,10 +17,11 @@ const Loging = () => {
         handleLogin(email, password)
             .then((result) => {
                 const user = result.user;
-                setUser(user)
+              setUser(user)
+              navigate(location?.state ? location.state : '/')
             })
-            .catch((error) => {
-            alert(error.code)
+            .catch((err) => {
+            setError({...error, login: err.code})
         })
     }
 
@@ -33,8 +37,8 @@ const Loging = () => {
               <span className="label-text">Email</span>
             </label>
             <input
-                          type="email"
-                          name="email"
+              type="email"
+              name="email"
               placeholder="email"
               className="input input-bordered"
               required
@@ -45,12 +49,13 @@ const Loging = () => {
               <span className="label-text">Password</span>
             </label>
             <input
-                          type="password"
-                          name="password"
+              type="password"
+              name="password"
               placeholder="password"
               className="input input-bordered"
               required
             />
+            {error.login && <label className="label text-sm text-red-600">{error.login}</label>}
             <label className="label">
               <a href="#" className="label-text-alt link link-hover">
                 Forgot password?
